@@ -8,6 +8,7 @@ Created on Sat Apr 01 20:22:38 2017
 import matplotlib.pyplot as plt # plt 用于显示图片
 import matplotlib.image as mpimg # mpimg 用于读取图片
 import numpy as np
+import pylab as pl
 import random  
 
 #对像素块进行Z字排序
@@ -182,8 +183,7 @@ def RS(tmp):
     return res
 
 #LSB隐写
-def LSB(fig):
-    rate = input('please input the rate:\n')
+def LSB(fig,rate):
     s = int(512*512*rate)
     sec = [0] * (s)
     k = 0
@@ -232,6 +232,7 @@ tmp = [[0 for co in range(8)] for ro in range(8)]
 row = img.shape[0] / 8   #行
 col = img.shape[1] / 8   #列
 result = [0] *4
+nn = 0
 
 for i in range(64): 
     for j in range(64):
@@ -250,27 +251,54 @@ print 'orignal picture:'
 print 'rm=',result[0],'  sm=',result[1],'  r_m=',result[2],'  s_m=',result[3]
 
 #进行LSB隐写之后
-fig =  LSB(fig)
-#对图像分块并计算相关性
-tmp = [[0 for co in range(8)] for ro in range(8)]
-#print len(tmp)
-#print tmp
-row = img.shape[0] / 8   #行
-col = img.shape[1] / 8   #列
-result = [0] *4
+rate = 0
+rm = [0] * (11)
+sm = [0] * (11)
+r_m = [0] * (11)
+s_m = [0] * (11)
+while (rate <= 1.0):
+    fig =  LSB(fig,rate)
+    #对图像分块并计算相关性
+    tmp = [[0 for co in range(8)] for ro in range(8)]
+    #print len(tmp)
+    #print tmp
+    row = img.shape[0] / 8   #行
+    col = img.shape[1] / 8   #列
+    result = [0] *4
+    
+    for i in range(64): 
+        for j in range(64):
+            x=0
+            for k in range(i * 8, (i+1) * 8):
+                y=0
+                for h in range(j * 8, (j+1) * 8):
+                    tmp[x][y] = fig[k][h]
+                    y=y+1
+                x=x+1
+           # print tmp
+            res = RS(tmp)# 进行RS隐写分析,res = [rm,sm,r_m,s_m]
+            for n in range(4):
+                result[n] = result[n] + res[n]
+    print 'rate=',rate,'after LSB:'
+    print 'rm=',result[0],'  sm=',result[1],'  r_m=',result[2],'  s_m=',result[3]
+    rate += 1
+    
 
-for i in range(64): 
-    for j in range(64):
-        x=0
-        for k in range(i * 8, (i+1) * 8):
-            y=0
-            for h in range(j * 8, (j+1) * 8):
-                tmp[x][y] = fig[k][h]
-                y=y+1
-            x=x+1
-       # print tmp
-        res = RS(tmp)# 进行RS隐写分析,res = [rm,sm,r_m,s_m]
-        for n in range(4):
-            result[n] = result[n] + res[n]
-print 'after LSB:'
-print 'rm=',result[0],'  sm=',result[1],'  r_m=',result[2],'  s_m=',result[3]
+    rm[nn] = result[0]
+    sm[nn] = result[1]
+    r_m[nn] = result[2]
+    s_m[nn] = result[3]
+    nn = nn + 1
+    
+rate = 0
+arr = [0] * 11
+k = 0
+while (k <= 10):
+    rate = rate + 0.1
+    arr[k] = rate
+    k += 1
+RM=pl.plot(arr,rm)
+SM=pl.plot(arr,sm)
+R_M=pl.plot(arr,r_m)
+S_M=pl.plot(arr,s_m)
+pl.show()

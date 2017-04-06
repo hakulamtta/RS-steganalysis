@@ -281,9 +281,8 @@ while (rate <= 1.0):
                 result[n] = result[n] + res[n]
     print 'rate=',rate,'after LSB:'
     print 'rm=',result[0],'  sm=',result[1],'  r_m=',result[2],'  s_m=',result[3]
-    rate += 1
+    rate += 0.1
     
-
     rm[nn] = result[0]
     sm[nn] = result[1]
     r_m[nn] = result[2]
@@ -294,11 +293,12 @@ rate = 0
 arr = [0] * 11
 k = 0
 while (k <= 10):
-    rate = rate + 0.1
+    
     arr[k] = rate
     k += 1
-RM=pl.plot(arr,rm)
-SM=pl.plot(arr,sm)
-R_M=pl.plot(arr,r_m)
-S_M=pl.plot(arr,s_m)
+    rate = rate + 0.1
+pl.plot(arr,rm)
+pl.plot(arr,sm)
+pl.plot(arr,r_m)
+pl.plot(arr,s_m)
 pl.show()
